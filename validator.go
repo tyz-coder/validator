@@ -37,8 +37,9 @@ func Check(obj interface{}) error {
 func check(objType reflect.Type, parent, current reflect.Value) error {
 	var numField = objType.NumField()
 	for i := 0; i < numField; i++ {
-		var fieldStruct = objType.Field(i)
-		var fieldValue = current.Field(i)
+		var rFieldStruct = objType.Field(i)
+		var rFieldValue = current.Field(i)
+		var fieldValue = rFieldValue
 
 		if fieldValue.Kind() == reflect.Ptr {
 			fieldValue = fieldValue.Elem()
@@ -48,18 +49,19 @@ func check(objType reflect.Type, parent, current reflect.Value) error {
 			if err := check(fieldValue.Type(), parent, fieldValue); err != nil {
 				return err
 			}
-			continue
+			//continue
 		}
 
-		var mName = fieldStruct.Name + kFuncSuffix
+		var mName = rFieldStruct.Name + kFuncSuffix
 		var mValue = methodByName(mName, parent, current)
 
 		if mValue.IsValid() {
 			var pValue []reflect.Value
 			if fieldValue.IsValid() {
-				pValue = []reflect.Value{fieldValue}
+				//pValue = []reflect.Value{fieldValue}
+				pValue = []reflect.Value{rFieldValue}
 			} else {
-				pValue = []reflect.Value{reflect.New(fieldStruct.Type).Elem()}
+				pValue = []reflect.Value{reflect.New(rFieldStruct.Type).Elem()}
 			}
 			var rValueList = mValue.Call(pValue)
 
