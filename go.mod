@@ -1,3 +1,3 @@
-module github.com/smartwalle/validator
+module github.com/tyz-coder/validator
 
-go 1.12
+go 1.15

@@ -2,7 +2,7 @@ package validator_test
 
 import (
 	"errors"
-	"github.com/smartwalle/validator"
+	"github.com/tyz-coder/validator"
 	"testing"
 	"time"
 )
