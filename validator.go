@@ -15,18 +15,18 @@ var (
 )
 
 func Check(obj interface{}) error {
-	var objType = reflect.TypeOf(obj)
 	var objValue = reflect.ValueOf(obj)
-	var objValueKind = objValue.Kind()
+	var objType = objValue.Type()
+	var objKind = objValue.Kind()
 
 	for {
-		if objValueKind == reflect.Ptr && objValue.IsNil() {
+		if objKind == reflect.Ptr && objValue.IsNil() {
 			return ErrNilObject
 		}
-		if objValueKind == reflect.Ptr {
+		if objKind == reflect.Ptr {
 			objValue = objValue.Elem()
 			objType = objType.Elem()
-			objValueKind = objValue.Kind()
+			objKind = objValue.Kind()
 			continue
 		}
 		break
@@ -37,31 +37,32 @@ func Check(obj interface{}) error {
 func check(objType reflect.Type, parent, current reflect.Value) error {
 	var numField = objType.NumField()
 	for i := 0; i < numField; i++ {
-		var rFieldStruct = objType.Field(i)
-		var rFieldValue = current.Field(i)
-		var fieldValue = rFieldValue
+		var fieldStruct = objType.Field(i)
+		var fieldValue = current.Field(i)
 
-		if fieldValue.Kind() == reflect.Ptr {
+		var fieldValueKind = fieldValue.Kind()
+		var fieldValueType = fieldValue.Type()
+
+		if fieldValueKind == reflect.Ptr {
 			fieldValue = fieldValue.Elem()
 		}
 
-		if fieldValue.Kind() == reflect.Struct && fieldValue.Type() != reflect.TypeOf(time.Time{}) {
-			if err := check(fieldValue.Type(), parent, fieldValue); err != nil {
+		if fieldValueKind == reflect.Struct && fieldValueType != reflect.TypeOf(time.Time{}) {
+			if err := check(fieldValueType, parent, fieldValue); err != nil {
 				return err
 			}
 			//continue
 		}
 
-		var mName = rFieldStruct.Name + kFuncSuffix
+		var mName = fieldStruct.Name + kFuncSuffix
 		var mValue = methodByName(mName, parent, current)
 
 		if mValue.IsValid() {
 			var pValue []reflect.Value
 			if fieldValue.IsValid() {
-				//pValue = []reflect.Value{fieldValue}
-				pValue = []reflect.Value{rFieldValue}
+				pValue = []reflect.Value{fieldValue}
 			} else {
-				pValue = []reflect.Value{reflect.New(rFieldStruct.Type).Elem()}
+				pValue = []reflect.Value{reflect.New(fieldStruct.Type).Elem()}
 			}
 			var rValueList = mValue.Call(pValue)
 
