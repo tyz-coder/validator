@@ -15,7 +15,7 @@ var ErrEmptyTime = errors.New("应该有时间")
 
 type Human struct {
 	Name string
-	//Age  int
+	Age  int
 }
 
 func (this *Human) NameValidator(n string) error {
@@ -25,15 +25,15 @@ func (this *Human) NameValidator(n string) error {
 	return nil
 }
 
-//func (this Human) AgeValidator(a int) error {
-//	if a <= 0 {
-//		return ErrEmptyAge
-//	}
-//	if a > 100 {
-//		return ErrInvalidAge
-//	}
-//	return nil
-//}
+func (this Human) AgeValidator(a int) error {
+	if a <= 0 {
+		return ErrEmptyAge
+	}
+	if a > 100 {
+		return ErrInvalidAge
+	}
+	return nil
+}
 
 type Student struct {
 	Human  *Human
@@ -62,7 +62,7 @@ func TestCheck(t *testing.T) {
 	}{
 		{val: &Human{}, expect: ErrEmptyName},
 		{val: &Human{Name: "haha"}, expect: ErrEmptyAge},
-		//{val: &Human{Name: "haha", Age: 101}, expect: ErrInvalidAge},
+		{val: &Human{Name: "haha", Age: 101}, expect: ErrInvalidAge},
 	}
 
 	for _, item := range tests {
