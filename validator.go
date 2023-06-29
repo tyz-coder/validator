@@ -87,3 +87,33 @@ func methodByName(mName string, parent, current reflect.Value) reflect.Value {
 	}
 	return mValue
 }
+
+/**
+ * 通过判断Status是否实现了Validator方法,校验参数是否合格
+ */
+func CheckValidator(obj interface{}) error {
+	p := reflect.TypeOf(obj)
+	if p.Kind() == reflect.Pointer {
+		p = p.Elem()
+	}
+
+	// 不是结构体时
+	if p.Kind() != reflect.Struct {
+		return nil
+	}
+
+	object := reflect.ValueOf(obj)
+
+	// 获取到方法
+	newMethod := object.MethodByName(kFuncSuffix)
+	if newMethod.IsValid() {
+		var rValueList = newMethod.Call(nil)
+		if !rValueList[0].IsNil() {
+			var err = rValueList[0].Interface().(error)
+			return err
+		}
+		return nil
+	}
+
+	return nil
+}
