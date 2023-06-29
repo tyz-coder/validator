@@ -74,7 +74,7 @@ func TestCheck(t *testing.T) {
 
 func BenchmarkCheck(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		var s = &Student{Human: &Human{}}
+		var s = &Human{}
 		validator.Check(s)
 	}
 }
